@@ -11,28 +11,29 @@ import tensorflow as tf
 from tensorflow import Session
 
 
+class _BaseTFBoardLogger:
+    def __init__(self, log_dir: Union[Path, str]):
+        log_dir = str(log_dir)
+
+        if Path(log_dir).is_dir():
+            warnings.warn("Folder {0} is already created, maybe it contains other log files".format(log_dir))
+
+        self._log_dir = log_dir
+        self._summary_writer = tf.summary.FileWriter(log_dir)
+
+
 class TFBoardModelGraphLogger:
     def __init__(self):
         raise NotImplemented("You don't need to use the constructor of this class")
 
     @staticmethod
     def log_graph(log_dir, model_session: Session):
-        # Usually you can get the session by: keras.backend.get_session()
+        # You can get the session by: keras.backend.get_session()
         _ = tf.summary.FileWriter(str(log_dir), model_session.graph)
 
 
-class _BaseTFBoardLogger:
-    def __init__(self, log_dir: Union[Path, str]):
-        self.log_dir = log_dir
-
-        if Path(self.log_dir).is_dir():
-            warnings.warn("Folder {0} is already created, maybe it contains other log files".format(self.log_dir))
-
-        self._summary_writer = tf.summary.FileWriter(str(log_dir))
-
-
 class TFBoardHistogramLogger(_BaseTFBoardLogger):
-    def __init__(self, log_dir):
+    def __init__(self, log_dir: Union[Path, str]):
         super().__init__(log_dir)
 
     def log_histogram(self, tag: str, values: Union[np.ndarray, List], step: int, bins: int):
@@ -173,7 +174,7 @@ class TFBoardContinuousTextLogger:
 
 
 class TFBoardKerasModelWeightsLogger(TFBoardHistogramLogger):
-    def __init__(self, log_dir):
+    def __init__(self, log_dir: Union[Path, str]):
         super().__init__(log_dir)
 
     def log_weights(self, model, step: int, layer_regex: str = ".*", hist_bins: int = 100):
