@@ -1,10 +1,13 @@
 # Swiss Army Tensorboard
 
-A tool which helps to release the true potential of [Tensorboard](https://www.tensorflow.org/guide/summaries_and_tensorboard).
+A tool which helps you to release the true potential of [Tensorboard](https://www.tensorflow.org/guide/summaries_and_tensorboard).
 
 <img src="art/tensorboard_image.png" width="400" alt="tfboard sample">
 
 ## Loggers
+
+You can keep almost everything under a single Tensorboard, which can be really useful for presentations, tutorials,
+experiment results.
 
 - Text logger
 - Continuous text logger
@@ -15,6 +18,8 @@ A tool which helps to release the true potential of [Tensorboard](https://www.te
 ## Setup
 
 `pip install git+https://github.com/gaborvecsei/Swiss-Army-Tensorboard.git`
+
+(Or you can clone the repo and `python setup.py install`)
 
 ## Example
 
@@ -40,9 +45,13 @@ Text logger output (inside Tensorboard):
 
 ## Reference
 
-Part of the functions are made based on the following gist:
+*Image* and *Histogram loggers* are made based on the following gist:
 
 *[1]* https://gist.github.com/gyglim/1f8dfb1b5c82627ae3efcfbbadb9f514
+
+Keras train-validation callbacks is based on this stackoverflow answer:
+
+*[2]* https://stackoverflow.com/a/48393723/5108062
 
 ## About
 

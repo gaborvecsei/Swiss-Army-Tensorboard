@@ -36,8 +36,15 @@ class TFBoardHistogramLogger(_BaseTFBoardLogger):
     def __init__(self, log_dir: Union[Path, str]):
         super().__init__(log_dir)
 
-    def log_histogram(self, tag: str, values: Union[np.ndarray, List], step: int, bins: int):
+    def log_histogram(self, tag: str, values: Union[np.ndarray, list], step: int, bins: int):
         values = np.array(values)
+        histogram = self._create_histogram(values, bins)
+        summary = tf.Summary(value=[tf.Summary.Value(tag=tag, histo=histogram)])
+        self._summary_writer.add_summary(summary, step)
+        self._summary_writer.flush()
+
+    @staticmethod
+    def _create_histogram(values: np.ndarray, bins: int) -> tf.HistogramProto:
         counts, bin_edges = np.histogram(values, bins=bins)
 
         hist = tf.HistogramProto()
@@ -54,9 +61,7 @@ class TFBoardHistogramLogger(_BaseTFBoardLogger):
         for c in counts:
             hist.bucket.append(c)
 
-        summary = tf.Summary(value=[tf.Summary.Value(tag=tag, histo=hist)])
-        self._summary_writer.add_summary(summary, step)
-        self._summary_writer.flush()
+        return hist
 
 
 class TFBoardScalarLogger(_BaseTFBoardLogger):
@@ -74,13 +79,15 @@ class TFBoardImageLogger(_BaseTFBoardLogger):
 
     def log_images(self, tag: str, images: Union[List[np.ndarray], np.ndarray], step: int):
         image_summaries = []
-        for nr, img in enumerate(images):
+        for i, image in enumerate(images):
             image_str = BytesIO()
-            plt.imsave(image_str, img, format='png')
+            plt.imsave(image_str, image, format='png')
+            height, width = image.shape[:2]
             image_summary = tf.Summary.Image(encoded_image_string=image_str.getvalue(),
-                                             height=img.shape[0],
-                                             width=img.shape[1])
-            image_summaries.append(tf.Summary.Value(tag='%s/%d' % (tag, nr), image=image_summary))
+                                             height=height,
+                                             width=width)
+            image_tag = "{0}/{1}".format(tag, i)
+            image_summaries.append(tf.Summary.Value(tag=image_tag, image=image_summary))
 
         summary = tf.Summary(value=image_summaries)
         self._summary_writer.add_summary(summary, step)
