@@ -3,12 +3,11 @@ import shutil
 from typing import Union
 
 import tensorflow as tf
-from keras.callbacks import TensorBoard, Callback
 
 from swiss_army_tensorboard import tfboard_loggers
 
 
-class TFBoardTrainValidationLossCallback(TensorBoard):
+class TFBoardTrainValidationLossCallback(tf.keras.callbacks.TensorBoard):
     def __init__(self, log_dir: str, sub_dir_training="training_losses", sub_dir_validation="validation_losses",
                  remove_already_existing_folders: bool = False, write_graph: bool = True,
                  update_freq: Union[str, int] = "epochs"):
@@ -42,12 +41,12 @@ class TFBoardTrainValidationLossCallback(TensorBoard):
         logs = {k: v for k, v in logs.items() if not k.startswith('val_')}
         super().on_epoch_end(epoch, logs)
 
-    def on_train_end(self, _):
-        super().on_train_end(_)
+    def on_train_end(self, logs=None):
+        super().on_train_end(logs)
         self.val_writer.close()
 
 
-class TFBoardWeightHistogramsCallback(Callback):
+class TFBoardWeightHistogramsCallback(tf.keras.callbacks.Callback):
     def __init__(self, layer_regex: str, log_dir: str, sub_dir="histograms", hist_bins: int = 100,
                  remove_already_existing_folders: bool = False):
         super().__init__()
